@@ -97,11 +97,44 @@ def find_signature_conflicts(cls_name):
     if cls.ancestor_name is None:
         return []
 
+    conflicts = []
+
     ancestor = CLASSES[cls_name]
+    while True:
+        for name, method in cls.methods.items():
+            if not name in ancestor.methods:
+                continue
+            anc_methods = ancestor.methods[name]
+            if len(anc_methods.params) != len(method.params):
+                conflicts.append("%s: amount of params differs regarding %s" % (name, ancestor.name)) 
+
+        if ancestor.ancestor_name is None:
+            return conflicts
+        else:
+            try:
+                ancestor = CLASSES[ancestor.ancestor_name]
+            except:
+                conflicts.append("Unknown ancestor %s" % ancestor.ancestor_name)
+                return conflicts
+
+TOTAL_CONFLICTS = [0]
+
+def find_all_signature_conflicts():
+    TOTAL_CONFLICTS[0] = 0
+    for n,cls in CLASSES.items():
+        cs = find_signature_conflicts(n)
+        TOTAL_CONFLICTS[0] += len(cs)
+        yield (n, cls.path, cs)
+
+def print_all_signature_conflicts():
+    for (name, path, conflicts) in find_all_signature_conflicts():
+        if len(conflicts) > 0:
+            print "%s (%s)" % (name, path)
+            print "\t" + ("\n\t".join(conflicts))
+            print ""
+
+    print "TOTAL: %d" % TOTAL_CONFLICTS[0]
 
 if __name__ == "__main__":
     make_ILIAS_CLASSES()
-    for c in class_infos("/home/lechimp/Code/ILIAS"):
-        CLASSES[c.name] = c
-        print "-------------------------------------------"
-        print c.pp()
+    print_all_signature_conflicts()
