@@ -51,6 +51,12 @@ class ClassInfo(object):
                   , "\n\t\t".join([m.pp() for m in self.methods.values()])
                   ))
 
+    def all_ancestors(self):
+        yield self.ancestor_name
+        if self.ancestor_name in CLASSES:
+            for a in CLASSES[self.ancestor_name].all_ancestors():
+                yield a
+
 method_info_re = re.compile("function\s+(\w+)\s*\(([^)]*)\)")
 params_re = re.compile("(\w+)?\s*[$](\w+)")
 
@@ -92,6 +98,9 @@ def make_ILIAS_CLASSES():
     for c in class_infos("/home/lechimp/Code/ILIAS"):
         CLASSES[c.name] = c
 
+CONFLICT_UNKNOWN_ANCESTOR = 1
+CONFLICT_PARAM_LEN_DIFFERS = 2
+
 def find_signature_conflicts(cls_name):
     cls = CLASSES[cls_name]
     if cls.ancestor_name is None:
@@ -106,7 +115,8 @@ def find_signature_conflicts(cls_name):
                 continue
             anc_methods = ancestor.methods[name]
             if len(anc_methods.params) != len(method.params):
-                conflicts.append("%s: amount of params differs regarding %s" % (name, ancestor.name)) 
+                conflicts.append((CONFLICT_PARAM_LEN_DIFFERS
+                        , "%s: amount of params differs regarding %s" % (name, ancestor.name)))
 
         if ancestor.ancestor_name is None:
             return conflicts
@@ -114,26 +124,46 @@ def find_signature_conflicts(cls_name):
             try:
                 ancestor = CLASSES[ancestor.ancestor_name]
             except:
-                conflicts.append("Unknown ancestor %s" % ancestor.ancestor_name)
+                conflicts.append((CONFLICT_UNKNOWN_ANCESTOR, "Unknown ancestor %s" % ancestor.ancestor_name))
                 return conflicts
 
-TOTAL_CONFLICTS = [0]
 
 def find_all_signature_conflicts():
-    TOTAL_CONFLICTS[0] = 0
-    for n,cls in CLASSES.items():
+    for n, cls in CLASSES.items():
         cs = find_signature_conflicts(n)
-        TOTAL_CONFLICTS[0] += len(cs)
-        yield (n, cls.path, cs)
+        yield (cls, cs)
+
+def signature_conflicts_flat():
+    for cls, cs in find_all_signature_conflicts():
+        for c in cs:
+            yield (cls, c)
 
 def print_all_signature_conflicts():
-    for (name, path, conflicts) in find_all_signature_conflicts():
+    for (cls, conflicts) in find_all_signature_conflicts():
         if len(conflicts) > 0:
-            print "%s (%s)" % (name, path)
-            print "\t" + ("\n\t".join(conflicts))
+            print "%s (%s)" % (cls.name, cls.path)
+            print "\t" + ("\n\t".join([p[1] for p in conflicts]))
             print ""
 
-    print "TOTAL: %d" % TOTAL_CONFLICTS[0]
+    conflicts_flat = [c for c in signature_conflicts_flat()]
+    print "TOTAL: %d" % len(conflicts_flat)
+
+    # Exceptions
+    conflicts_exceptions = [c for c in conflicts_flat if "Exception" in c[0].all_ancestors()]
+    print "IN Exceptions: %d" % len(conflicts_exceptions)
+
+    # ListGUI
+    conflicts_list_gui = [c for c in conflicts_flat if "ilObjectListGUI" in c[0].all_ancestors()]
+    print "IN ilObjectListGUIs: %d" % len(conflicts_list_gui)
+
+    # ObjectGUI
+    conflicts_object_gui = [c for c in conflicts_flat if "ilObjectGUI" in c[0].all_ancestors()]
+    print "IN ilObjectGUIs: %d" % len(conflicts_object_gui)
+
+    # TableGUI
+    conflicts_table_gui = [c for c in conflicts_flat if "ilTable2GUI" in c[0].all_ancestors()]
+    print "IN ilTable2GUIs: %d" % len(conflicts_table_gui)
+
 
 if __name__ == "__main__":
     make_ILIAS_CLASSES()
