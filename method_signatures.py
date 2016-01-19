@@ -138,6 +138,9 @@ def signature_conflicts_flat():
         for c in cs:
             yield (cls, c)
 
+def filter_with_base_class(bc_name, cs):
+    return [c for c in cs if bc_name in c[0].all_ancestors()]
+
 def print_all_signature_conflicts():
     for (cls, conflicts) in find_all_signature_conflicts():
         if len(conflicts) > 0:
@@ -149,21 +152,20 @@ def print_all_signature_conflicts():
     print "TOTAL: %d" % len(conflicts_flat)
 
     # Exceptions
-    conflicts_exceptions = [c for c in conflicts_flat if "Exception" in c[0].all_ancestors()]
+    conflicts_exceptions = filter_with_base_class("Exception", conflicts_flat)
     print "IN Exceptions: %d" % len(conflicts_exceptions)
 
     # ListGUI
-    conflicts_list_gui = [c for c in conflicts_flat if "ilObjectListGUI" in c[0].all_ancestors()]
+    conflicts_list_gui = filter_with_base_class("ilObjectListGUI", conflicts_flat)
     print "IN ilObjectListGUIs: %d" % len(conflicts_list_gui)
 
     # ObjectGUI
-    conflicts_object_gui = [c for c in conflicts_flat if "ilObjectGUI" in c[0].all_ancestors()]
+    conflicts_object_gui = filter_with_base_class("ilObjectGUI", conflicts_flat)
     print "IN ilObjectGUIs: %d" % len(conflicts_object_gui)
 
     # TableGUI
-    conflicts_table_gui = [c for c in conflicts_flat if "ilTable2GUI" in c[0].all_ancestors()]
+    conflicts_table_gui = filter_with_base_class("ilTable2GUI", conflicts_flat)
     print "IN ilTable2GUIs: %d" % len(conflicts_table_gui)
-
 
 if __name__ == "__main__":
     make_ILIAS_CLASSES()
