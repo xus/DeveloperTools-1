@@ -28,7 +28,6 @@
 import os
 import re
 import sys
-import operator
 
 ILIAS_PATH = [None]
 
