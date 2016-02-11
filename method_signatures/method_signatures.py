@@ -219,7 +219,7 @@ def find_signature_conflicts(cls_name):
 
 def find_all_signature_conflicts():
     """ Search conflicts in all classes. """
-    for n, cls in CLASSES.items():
+    for n, cls in sorted(CLASSES.items(), key=lambda tup: tup[1].path):
         cs = find_signature_conflicts(n)
         yield (cls, cs)
 
