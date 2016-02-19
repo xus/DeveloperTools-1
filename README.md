@@ -1,11 +1,11 @@
 # DeveloperTools
 Tools for ILIAS Developent. Current focus on PHP7 Compatibility
 
-Please checkout as "tools" in Customizing/global:
+Please clone as "tools" in Customizing/global:
 
 ```bash
 cd Customizing/global/
-git checkout https://github.com/ILIAS-eLearning/DeveloperTools.git tools
+git clone https://github.com/ILIAS-eLearning/DeveloperTools.git tools
 ```
 
 ## Branching
