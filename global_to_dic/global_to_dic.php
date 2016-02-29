@@ -1,7 +1,7 @@
 <?php
 /**
 *	Call this script via 
-*	php SIG_refactoring_script.php {relative_path_containing_php-files}
+*	php global_to_dic.php {relative_path_containing_php-files}
 *	Make sure to put this script above processed folders.
 *	Allthough nothing terrible should happen, if you have your files versioned, and you may rewind any changes performed
 	USE THIS WITH CARE AND AT YOUR OWN RISK ONLY!
@@ -69,6 +69,12 @@ function transformFile($file) {
 	fclose($file_handle);
 	return $output_contents;
 }
+
+if (count($argv) != 2) {
+	die("\n".'USAGE: php global_to_dic.php {relative_path_containing_php-files}'."\n\n");
+}
+
+
 $directories = array($argv[1]); 			//input directory-path relative to execution dir
 while($aux_dir = current($directories)) {	//	iterate directories recursively by appending them to $directories var 
 	if($handle = opendir($aux_dir)) {		//	iteration starts with input
