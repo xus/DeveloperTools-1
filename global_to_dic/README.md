@@ -1,4 +1,4 @@
-= Globals to Dependency Injection Container =
+# Globals to Dependency Injection Container
 
 According to [Jour Fixe](http://www.ilias.de/docu/goto.php?target=wiki_1357_JourFixe-2015-08-03)
 we want to introduce a Dependency Injection Container starting with ILIAS 5.2..
