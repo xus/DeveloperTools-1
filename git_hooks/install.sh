@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #execute this file in the root folder of your git repository.
 #	it will automatically copy all the hooks in git_hooks/hooks folder 
 #	to their appropriate location in .git/hooks/
