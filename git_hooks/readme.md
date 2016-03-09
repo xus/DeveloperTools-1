@@ -1,0 +1,21 @@
+** Githooks-Developer Tools **
+Introducing Githooks in order to streamline the 
+development and catch possible errors at early stage.
+
+** Introduction **
+Githooks are scripts, that are called at certain events
+in a git-repository, e.g. pre-commit or post-commit, which
+are called (nomen est omen) right  before or after a commit
+process is initiated. 
+(for a complete list of possible githooks
+please refer to git documentation).
+
+They are placed in the .git/hooks/, but are called in the
+repository root. The script install, that should be called from
+rhe repo root will do this for you atomatically. You may add 
+your hooks simply by adding them into the git_hooks/hooks folder.
+
+Utility-scripts that are called by the git hooks should be placed
+in the support-folder. Also, please refer to the already present 
+pre-commit hook, which should serve as a good example.
+
