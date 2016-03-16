@@ -113,7 +113,7 @@ class ClassInfo(object):
 method_info_re = re.compile("function\s+(\w+)\s*\(([^)]*)\)")
 # We deconstruct the parameters regarding type hints and parameter names, but
 # NOT REGARDING DEFAULTS!!
-params_re = re.compile("(\w+)?\s*[$](\w+)")
+params_re = re.compile("(\w+)?\s*[$](\w+)(\s+\S)?")
 
 def method_infos(path, content):
     """ Gather information on all methods in a class. """
@@ -136,7 +136,6 @@ def method_infos(path, content):
 
 def param_infos(path, content):
     """ Gather information about parameters.
-
         DOES NOT TAKE CARE OF DEFAULTS IN PARAMETERLISTS!
     """
     params = []
@@ -146,7 +145,7 @@ def param_infos(path, content):
             # and done
             return params
         # We use the name of the param and an (optional) type hint.
-        params.append((res.group(2), res.group(1)))
+        params.append((res.group(2), res.group(1), res.group(3) is not None))
         # We already searched the content to the end of the match.
         content = content[res.end():]
 
@@ -174,6 +173,8 @@ def make_ILIAS_CLASSES():
 # Some tags for errors.
 CONFLICT_UNKNOWN_ANCESTOR = 1
 CONFLICT_PARAM_LEN_DIFFERS = 2
+CONFLICT_PARAM_TYPE_DIFFERS = 3
+CONFLICT_PARAM_NEEDS_DEFAULT = 4
 
 def find_signature_conflicts(cls_name):
     """ Find conflicts in signature for the class with the given name. """
@@ -195,12 +196,39 @@ def find_signature_conflicts(cls_name):
             # there is no conflict.
             if not name in ancestor.methods:
                 continue
+
+            # The constructor is not affected by this new behavior
+            if name == "__construct":
+                continue
+
             anc_methods = ancestor.methods[name]
-            # This is the only check we currently make, the length of
-            # the parameter lists.
-            if len(anc_methods.params) != len(method.params):
+
+            # Check the length of the parameter lists.
+            if len(anc_methods.params) > len(method.params):
                 conflicts.append((CONFLICT_PARAM_LEN_DIFFERS,
                     "%s: amount of params differs regarding %s" % (name, ancestor.name)))
+
+            # Go through parameters
+            for i in xrange(0, len(method.params)-1):
+
+                # Checks if ancestor method has less parameters,
+                # breaks and throw conflict if method defines no default
+                # otherwise it continues to next parameter because type can't differ
+                if i > (len(anc_methods.params) -1):
+
+                    if not method.params[i][2]:
+                        conflicts.append((CONFLICT_PARAM_NEEDS_DEFAULT,
+                            "%s: param needs default regarding %s" % (name, ancestor.name)))
+                        break
+
+                    continue
+                # Checks if parameter type differ
+                if anc_methods.params[i][1] != method.params[i][1]:
+                    conflicts.append((CONFLICT_PARAM_TYPE_DIFFERS,
+                        "%s: type mismatch regarding %s" % (name, ancestor.name)))
+                    break
+
+
 
         # We reached the end of the chain of ancestors...
         if ancestor.ancestor_name is None:
