@@ -1,22 +1,24 @@
 #!/bin/bash
+#set -x
+#set -e
+count=0
 
-count=0					#stores number of faulty files
-
-not_ok=`tput setaf 1`	#texcolor for faulty files
-ok=`tput setaf 2`		#texcolor non faulty files
+red=`tput setaf 1`
+green=`tput setaf 2`
 reset=`tput sgr0`
-
+echo "checking for parse errors"
 for file in $(git diff --cached --name-only --diff-filter=ACM | grep -e '\.php$')
 do
 	if 	php -l ${file}
 	then
-		echo "${ok}$file ok${reset}"
+		echo "${green}$file ok${reset}"
 	else
-		echo -e "${not_ok}$file not ok${reset}\n" #if parse errors detected, count
+		echo -e "${red}$file not ok, parse errors found, resetting it${reset}\n"
+		git reset ${file}
 		count+=1
 	fi
 done
-if [[ $count -gt 0 ]]	#if count of faulty files > 0, exit code 1
+if [[ $count -gt 0 ]]
 then 
 	exit 1
 else
