@@ -1,0 +1,12 @@
+#!/bin/bash
+# Use this script to make a quick pass over the file fixing it
+# to comply with the ilias coding standarts.
+
+if [ ! -e $1 ]
+then
+	echo "${1} seems not to be a valid path"
+	exit 1
+fi
+php ./git_hooks/composer/vendor/squizlabs/php_codesniffer/scripts/phpcs --standard=git_hooks/ilCodingStandard ${1}
+
+echo "done"
