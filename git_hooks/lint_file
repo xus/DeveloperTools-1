@@ -7,6 +7,6 @@ then
 	echo "${1} seems not to be a valid path"
 	exit 1
 fi
-php ./git_hooks/composer/vendor/squizlabs/php_codesniffer/scripts/phpcs --standard=git_hooks/ilCodingStandard ${1}
+php ./git_hooks/composer/vendor/squizlabs/php_codesniffer/scripts/phpcbf --standard=git_hooks/ilCodingStandard ${1}
 
 echo "done"
