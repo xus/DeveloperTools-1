@@ -1,0 +1,10 @@
+{
+    "require": {
+        "squizlabs/php_codesniffer": "*"
+    },
+    "autoload" : {
+		"psr-4" : {
+			"ilCodingStandard\\Sniffs\\NameSniff\\" : "../ilCodingStandard/Sniffs/NameSniffs"
+		}
+	}
+}

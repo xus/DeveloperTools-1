@@ -2,3 +2,5 @@
 
 *.pyc
 *.swp
+/git_hooks/composer/vendor
+/git_hooks/composer/composer.lock

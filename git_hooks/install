@@ -1,0 +1,17 @@
+#!/bin/bash
+
+for file in $(ls ./git_hooks/hooks/)
+do
+   	cp git_hooks/hooks/${file} ./.git/hooks/
+	chmod +x .git/hooks/${file}
+done
+
+(	cd  git_hooks
+	if [ ! -d "composer" ]
+	then
+		mkdir composer
+	fi
+	cd composer
+	composer require "squizlabs/php_codesniffer=*"; 
+	composer install
+)
