@@ -2,9 +2,9 @@
 <?php
 /* Copyright (c) 1998-2016 ILIAS open source, Extended GPL */
 
-/* Needs a code directory and candidates.csv (as obtained from ILIAS lang administration) as input.
+/* Needs a code directory and lang_legacy_candidates.csv (as obtained from ILIAS lang administration) as input.
    All lang vars that have been found in ILIAS code will be removed and
-   output list will be written to candidates_dep.csv file.
+   output list will be written to lang_legacy_candidates_dep.csv file.
 */
 
 namespace il\Language;
